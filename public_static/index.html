@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ChatIO</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <div id="container">
+        <div id="names">
+            <h1>ChatIO </h1>
+            <p>
+                Create Username:
+            </p>
+            <form id="userForm">
+                <input type="text" size="35" id="username">
+                <input type="submit" value="submit">
+            </form>
+        </div>
+       
+        <div id="main">
+            <h1> ChatIO </h1>
+            <div id="chat">
+                <div id="chatWindow"></div>
+                <form id="messageForm">
+                    <input type="text" id="message" size="35" placeholder="Type Something....">
+                    <input type="submit" value="SEND">
+                </form>
+            </div>
+
+        <div id="userWrapper">
+            <div id="users"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+      
+      $(function() {
+        
+        var socket = io.connect();
+        var messageForm = $('#messageForm');
+        var message = $('#message');
+        var chatWindow = $('#chatWindow');
+        var userForm = $('#userForm');
+        var users = $('#users');
+        var username = $('#username');
+        var error = $('#error');
+
+        userForm.submit(function(e) {
+          e.preventDefault();
+          socket.emit('new user',username.val(), function(data) {
+              if (data) {
+                  $('#names').hide();
+                  $('#main').show();
+              }
+              else {
+                  error.html('Username is already taken');
+              }
+          });
+          username.val('');
+
+        });   
+        
+        socket.on ('usernames', function(data) {
+           var html = '';
+           for (i=0; i< data.length; i++) {
+               html += data[i] + '<br>';
+           }
+           users.html(html);
+
+        });
+
+
+        messageForm.submit(function(e) {
+          e.preventDefault();
+          socket.emit('send message',message.val());
+          message.val('');
+
+        });
+
+        socket.on ('new message', function(data) {
+           chatWindow.append('strong' + data.user + '</strong> : ' + data.msg + '<br>');
+
+        });
+
+      });
+    
+    </script>
+
+</body>
+</html>
