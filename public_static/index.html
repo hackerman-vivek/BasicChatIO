@@ -10,20 +10,21 @@
 <body>
     
     <div id="container">
-        <div id="names">
+        <div id="namesWrapper">
             <h1>ChatIO </h1>
             <p>
                 Create Username:
             </p>
-            <form id="userForm">
+            <div id="error"></div>
+            <form id="usernameForm">
                 <input type="text" size="35" id="username">
-                <input type="submit" value="submit">
+                <input type="submit" value="Submit">
             </form>
         </div>
        
-        <div id="main">
+        <div id="mainWrapper">
             <h1> ChatIO </h1>
-            <div id="chat">
+            <div id="chatWrapper">
                 <div id="chatWindow"></div>
                 <form id="messageForm">
                     <input type="text" id="message" size="35" placeholder="Type Something....">
@@ -47,18 +48,18 @@
         var socket = io.connect();
         var messageForm = $('#messageForm');
         var message = $('#message');
-        var chatWindow = $('#chatWindow');
-        var userForm = $('#userForm');
+        var chat = $('#chatWindow');
+        var usernameForm = $('#usernameForm');
         var users = $('#users');
         var username = $('#username');
         var error = $('#error');
 
-        userForm.submit(function(e) {
+        usernameForm.submit(function(e) {
           e.preventDefault();
           socket.emit('new user',username.val(), function(data) {
               if (data) {
-                  $('#names').hide();
-                  $('#main').show();
+                  $('#namesWrapper').hide();
+                  $('#mainWrapper').show();
               }
               else {
                   error.html('Username is already taken');
@@ -86,7 +87,7 @@
         });
 
         socket.on ('new message', function(data) {
-           chatWindow.append('strong' + data.user + '</strong> : ' + data.msg + '<br>');
+           chat.append('<strong>' + data.user + '</strong> : ' + data.msg + '<br>');
 
         });
 
