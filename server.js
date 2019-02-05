@@ -1,15 +1,17 @@
 const express = require('express');
 const socketio = require('socket.io');
-const http = require('http')
+const http = require('http');
 
 const app = express(); // creates express app
-const server = http.Server(app) //creates http server using the app
+const server = http.createServer(app) //creates http server using the app
 const io = socketio(server) //adds a socket on above server
+
+
 var usernames = [];
 
 app.use('/', express.static(__dirname + '/public_static'))
 
-io.on('connection', (socket) => {
+io.sockets.on('connection', (socket) => {
   // all code here runs in the scope
   // of a single socket
 
@@ -26,12 +28,12 @@ io.on('connection', (socket) => {
   });
 
   function updateUsernames() {
-      io.sockets.emit('usernames',username);
+      io.sockets.emit('usernames',usernames);
   }
 
   socket.on('send message', (data) => {
 
-    io.emit('new message', {msg : data, user : socket.username});
+    io.sockets.emit('new message', {msg : data, user : socket.username});
 
   });
 
